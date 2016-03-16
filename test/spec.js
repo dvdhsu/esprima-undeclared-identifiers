@@ -23,5 +23,14 @@ describe('esprima-undeclared-identifiers', function () {
 
     const found3 = undeclared('var a, b, c; d')
     expect(found3[0]).to.equal('d')
+
+    const found4 = undeclared(`const beginning = editor.getSelectedScreenRange().start
+  if (beginning.column !== 0) {
+    beginning.column = 0
+    const selectionRange = editor.getSelectedScreenRange()
+    selectionRange.start = beginning
+    editor.setSelectedScreenRange(selectionRange)
+  }`)
+    expect(found4[0]).to.equal('editor')
   })
 })

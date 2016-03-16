@@ -23,7 +23,7 @@ module.exports = (sourceCode) => {
       currentScope.push(node.id.name)
     }
     if (parent && parent.type === 'MemberExpression') {
-      if (parent.object.name === node.name) {
+      if (node.name && parent.object.name === node.name) {
         identifiers.push(node.name)
       }
     } else {
@@ -52,11 +52,11 @@ module.exports = (sourceCode) => {
   }
 
   function checkForLeaks (identifiers, scopeChain) {
-    for (var i = 0; i < identifiers.length; i++) {
-      if (!isVarDefined(identifiers[i], scopeChain)) {
-        undefinedIdentifiers.add(identifiers[i])
+    identifiers.forEach((identifier) => {
+      if (!isVarDefined(identifier, scopeChain)) {
+        undefinedIdentifiers.add(identifier)
       }
-    }
+    })
   }
 
   estraverse.traverse(ast, {
