@@ -1,28 +1,27 @@
-/* eslint-env node, mocha */
-const undeclared = require('../index')
-const expect = require('chai').expect
+/* eslint-env jest */
+import undeclared from '../index'
 
-describe('esprima-undeclared-identifiers', function () {
-  it('should return empty array if no undeclared identifiers are in the source code', function () {
-    expect(undeclared('var answer = 6 * 7;').length).to.equal(0)
+describe('esprima-undeclared-identifiers', () => {
+  it('should return empty array if no undeclared identifiers are in the source code', () => {
+    expect(undeclared('var answer = 6 * 7;').length).toBe(0)
   })
 
-  it('should find undeclared identifiers', function () {
+  it('should find undeclared identifiers', () => {
     const found = undeclared('answer = 6 * 7;')
-    expect(found.length).to.equal(1)
-    expect(found[0]).to.equal('answer')
+    expect(found.length).toEqual(1)
+    expect(found[0]).toEqual('answer')
 
     const found2 = undeclared(`for (i = 0; i < scopeChain.length; i++) {
     var scope = scopeChain[i]
       if (scope.indexOf(varname) !== -1) {
       }
     }`)
-    expect(found2[0]).to.equal('i')
-    expect(found2[1]).to.equal('scopeChain')
-    expect(found2[2]).to.equal('varname')
+    expect(found2[0]).toEqual('i')
+    expect(found2[1]).toEqual('scopeChain')
+    expect(found2[2]).toEqual('varname')
 
     const found3 = undeclared('var a, b, c; d')
-    expect(found3[0]).to.equal('d')
+    expect(found3[0]).toEqual('d')
 
     const found4 = undeclared(`const beginning = editor.getSelectedScreenRange().start
   if (beginning.column !== 0) {
@@ -31,6 +30,16 @@ describe('esprima-undeclared-identifiers', function () {
     selectionRange.start = beginning
     editor.setSelectedScreenRange(selectionRange)
   }`)
-    expect(found4[0]).to.equal('editor')
+    expect(found4[0]).toEqual('editor')
+  })
+
+  it('a', () => {
+    const un = undeclared(`  if (user) {
+      const {profile} = user
+      const {profile: {a: deeplyDestructured}} = user
+      globalState.extend({user: profile, token, deeplyDestructured})
+    }`)
+    expect(un[0]).toEqual('user')
+    expect(un).toEqual(['user', 'globalState', 'token'])
   })
 })

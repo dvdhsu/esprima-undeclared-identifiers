@@ -1,10 +1,11 @@
 {
   "name": "esprima-undeclared-identifiers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "given a javascript source code, it returns any undeclared identifiers",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "jest",
+    "tdd": "jest -w",
     "precommit": "npm test",
     "pretest": "node_modules/.bin/standard"
   },
@@ -24,13 +25,16 @@
   },
   "homepage": "https://github.com/capaj/esprima-undeclared-identifiers#readme",
   "dependencies": {
-    "esprima": "^2.7.2",
+    "esprima": "^3.1.3",
     "estraverse": "^4.2.0"
   },
   "devDependencies": {
+    "babel-jest": "^19.0.0",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-react": "^6.23.0",
     "chai": "^3.5.0",
-    "husky": "^0.11.3",
-    "mocha": "^2.4.5",
-    "standard": "^6.0.8"
+    "husky": "^0.13.2",
+    "jest": "^19.0.2",
+    "standard": "^9.0.2"
   }
 }

@@ -9,7 +9,10 @@ function createsNewScope (node) {
 }
 
 module.exports = (sourceCode) => {
-  const ast = esprima.parse(sourceCode)
+  const ast = esprima.parse(sourceCode, {
+    jsx: true,
+    tolerant: true
+  })
   const scopeChain = []
   let identifiers = []
   const undefinedIdentifiers = new Set()
@@ -19,8 +22,23 @@ module.exports = (sourceCode) => {
       scopeChain.push([])
     }
     if (node.type === 'VariableDeclarator') {
-      var currentScope = scopeChain[scopeChain.length - 1]
-      currentScope.push(node.id.name)
+      const currentScope = scopeChain[scopeChain.length - 1]
+      if (node.id.name) {
+        currentScope.push(node.id.name)
+      } else {
+        const pushDesctructuredToScope = (properties) => {
+          properties.forEach((prop) => {
+            if (prop.value.name) {
+              currentScope.push(prop.value.name)
+            } else { // deeper into the destructuring object tree
+              pushDesctructuredToScope(prop.value.properties)
+            }
+          })
+        }
+        pushDesctructuredToScope(node.id.properties)
+      }
+
+      return estraverse.VisitorOption.Skip
     }
     if (parent && parent.type === 'MemberExpression') {
       if (node.name && parent.object.name === node.name) {
@@ -28,7 +46,10 @@ module.exports = (sourceCode) => {
       }
     } else {
       if (node.type === 'Identifier') {
-        identifiers.push(node.name)
+        // console.log('parent', parent, scopeChain)
+        if (parent.type !== 'VariableDeclarator') {
+          identifiers.push(node.name)
+        }
       }
     }
   }
@@ -43,7 +64,8 @@ module.exports = (sourceCode) => {
 
   function isVarDefined (varname, scopeChain) {
     for (var i = 0; i < scopeChain.length; i++) {
-      var scope = scopeChain[i]
+      const scope = scopeChain[i]
+      // console.log('scopeChain: ', scopeChain);
       if (scope.indexOf(varname) !== -1) {
         return true
       }
