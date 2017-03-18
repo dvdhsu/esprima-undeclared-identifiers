@@ -37,8 +37,9 @@ module.exports = (sourceCode) => {
         }
         pushDesctructuredToScope(node.id.properties)
       }
-
-      return estraverse.VisitorOption.Skip
+      if (node.id.type === 'ObjectPattern') {
+        return estraverse.VisitorOption.Skip
+      }
     }
     if (parent && parent.type === 'MemberExpression') {
       if (node.name && parent.object.name === node.name) {
@@ -46,8 +47,12 @@ module.exports = (sourceCode) => {
       }
     } else {
       if (node.type === 'Identifier') {
-        // console.log('parent', parent, scopeChain)
         if (parent.type !== 'VariableDeclarator') {
+          if (parent.type === 'Property') {
+            if (parent.key === node) {
+              return
+            }
+          }
           identifiers.push(node.name)
         }
       }

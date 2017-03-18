@@ -33,13 +33,20 @@ describe('esprima-undeclared-identifiers', () => {
     expect(found4[0]).toEqual('editor')
   })
 
-  it('a', () => {
+  it('destructuring', () => {
     const un = undeclared(`  if (user) {
       const {profile} = user
       const {profile: {a: deeplyDestructured}} = user
       globalState.extend({user: profile, token, deeplyDestructured})
     }`)
-    expect(un[0]).toEqual('user')
     expect(un).toEqual(['user', 'globalState', 'token'])
+  })
+
+  it('picks even inside call expression', () => {
+    const un = undeclared(`const state = observable({
+  selectedTab: SearchListStore.CONVERSATIONS_TABS
+})`)
+
+    expect(un).toEqual(['observable', 'SearchListStore'])
   })
 })

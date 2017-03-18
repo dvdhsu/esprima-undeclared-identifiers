@@ -1,6 +1,6 @@
 {
   "name": "esprima-undeclared-identifiers",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "given a javascript source code, it returns any undeclared identifiers",
   "main": "index.js",
   "scripts": {
