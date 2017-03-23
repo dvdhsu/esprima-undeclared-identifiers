@@ -74,6 +74,13 @@ module.exports = (sourceCode) => {
   }
 
   function leave (node) {
+    if (node.type === 'CallExpression') {
+      // prop.value.funcCall
+      const lastId = identifiers[identifiers.length - 1]
+      // prop.value
+      identifiers[identifiers.length - 1] = lastId.split('.').slice(0, lastId.split(',').length - 2).join('.')
+    }
+
     if (createsNewScope(node)) {
       checkForLeaks(identifiers, scopeChain)
       scopeChain.pop()
