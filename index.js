@@ -15,9 +15,15 @@ module.exports = (sourceCode) => {
   })
   const scopeChain = []
   let identifiers = []
+  let lastFoundIdentifier = null;
   const undefinedIdentifiers = new Set()
 
   function enter (node, parent) {
+    // clear lastFoundIdentifier
+    if (parent && parent.type !== 'MemberExpression') {
+      lastFoundIdentifier = null
+    }
+
     if (createsNewScope(node)) {
       scopeChain.push([])
     }
@@ -42,7 +48,15 @@ module.exports = (sourceCode) => {
       }
     }
     if (parent && parent.type === 'MemberExpression') {
+      if ((parent.object && parent.object.name === lastFoundIdentifier) ||
+        parent.object.object && parent.object.property.name === lastFoundIdentifier) {
+        let lastConcat = identifiers[identifiers.length - 1]
+        lastConcat += `.${node.name}`
+        identifiers[identifiers.length - 1] = lastConcat
+        lastFoundIdentifier = node.name
+      }
       if (node.name && parent.object.name === node.name) {
+        lastFoundIdentifier = node.name
         identifiers.push(node.name)
       }
     } else {
